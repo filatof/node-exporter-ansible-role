@@ -16,27 +16,23 @@
     create_home: false
 
 - block:
-    - name: Download node_exporter binary to local folder
-      become: false
+    - name: Download node_exporter binary
       get_url:
         url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
-        checksum: "sha256:{{ node_exporter_checksum }}"
         mode: '0644'
       register: _download_binary
       until: _download_binary is succeeded
       retries: 5
       delay: 2
-      remote_src: yes
       check_mode: false
 
     - name: Unpack node_exporter binary
-      become: false
       unarchive:
         src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp"
         creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/node_exporter"
-      remote_src: yes
+        remote_src: yes
       check_mode: false
 
     - name: Propagate node_exporter binaries
@@ -46,4 +42,5 @@
         mode: 0755
         owner: root
         group: root
+        remote_src: yes
       notify: restart node_exporter
