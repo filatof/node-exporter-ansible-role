@@ -1,0 +1,8 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: restart node_exporter
+  become: true
+  systemd:
+    daemon_reload: true
+    name: node_exporter
+    state: restarted
