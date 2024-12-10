@@ -1,3 +1,4 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# tasks file for node-exporter
+- include_tasks: install.yml
+- include_tasks: configure.yml
