@@ -1,0 +1,13 @@
+{
+  "service": {
+    "id": "node-exporter-{{ ansible_hostname }}",
+    "name": "node-exporter",
+    "tags": ["node_exporter-{{ ansible_hostname }}"],
+    "address": "{{ ansible_default_ipv4.address }}",
+    "port": 9100,
+    "check": {
+      "http": "http://{{ ansible_default_ipv4.address }}:9100/metrics",
+      "interval": "10s"
+    }
+  }
+}

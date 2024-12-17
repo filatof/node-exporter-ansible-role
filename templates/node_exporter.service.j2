@@ -10,6 +10,10 @@ ExecStart={{ _node_exporter_binary_install_dir }}/node_exporter \
     --web.listen-address={{ node_exporter_web_listen_address }} \
     --web.telemetry-path={{ node_exporter_web_telemetry_path }}
 
+ExecStartPost=/usr/local/bin/consul services register /etc/consul.d/node_exporter.json
+ExecStopPost=/usr/local/bin/consul services deregister node-exporter
+
+
 SyslogIdentifier=node_exporter
 Restart=always
 RestartSec=1

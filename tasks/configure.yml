@@ -8,6 +8,14 @@
     mode: 0644
   notify: restart node_exporter
 
+- name: Copy the node_exporter service file for consul
+  template:
+    src: node_exporter.json.j2
+    dest: /etc/consul.d/node_exporter.json
+    owner: consul
+    group: consul
+    mode: '0644'
+
 - block:
     - name: Create node_exporter config directory
       file:
