@@ -1,39 +1,54 @@
-Role Name
-=========
+# Ansible Роль: Установка Node Exporter
 
-A brief description of the role goes here.
+## Описание
+Эта Ansible-роль устанавливает и настраивает Prometheus Node Exporter на целевых серверах.
 
-Requirements
-------------
+## Требования
+Для использования этой роли необходимо установить её через Ansible Galaxy:
 
-ansible-galaxy install -p roles -r roles/requirements.yml  
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+```bash
+ansible-galaxy install -p roles -r roles/requirements.yml
+```
 
-Role Variables
---------------
+Файл `roles/requirements.yml` должен содержать:
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+```yaml
+- src: https://github.com/filatof/node-exporter-ansible-role.git
+  name: node-exporter
+  scm: git
+  version: main
+```
 
-Dependencies
-------------
+## Переменные роли
+Роль поддерживает следующие переменные, которые можно настроить:
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+- `node_exporter_version` – версия Node Exporter (по умолчанию: `1.6.1`).
+- `node_exporter_user` – системный пользователь для запуска (по умолчанию: `node_exporter`).
+- `node_exporter_group` – группа пользователя (по умолчанию: `node_exporter`).
+- `node_exporter_web_listen_address` – адрес и порт, на котором будет работать Node Exporter (по умолчанию: `:9100`).
+- `node_exporter_bin_path` – путь для установки бинарного файла (по умолчанию: `/usr/local/bin/node_exporter`).
 
-Example Playbook
-----------------
+Все переменные можно переопределять в `vars/main.yml`, `defaults/main.yml` или передавать через параметры при вызове роли.
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+## Зависимости
+Роль не имеет внешних зависимостей.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+## Пример использования
+Пример использования роли в playbook:
 
-License
--------
+```yaml
+- hosts: all
+  become: yes
+  roles:
+    - role: node-exporter
+      node_exporter_version: "1.6.1"
+      node_exporter_web_listen_address: ":9100"
+```
 
+## Лицензия
 BSD
 
-Author Information
-------------------
+## Автор
+Разработчик: filatof EQ
+Репозиторий: [GitHub](https://github.com/filatof/node-exporter-ansible-role)
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
