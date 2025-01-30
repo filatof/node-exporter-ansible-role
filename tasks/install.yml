@@ -1,15 +1,22 @@
 ---
 - name: Create the node_exporter group
-  group:
+  ansible.builtin.group:
     name: "node_exporter"
     state: present
     system: true
 
 
+- name: Check if consul group exists
+  ansible.builtin.getent:
+    database: group
+    key: consul
+  register: consul_group
+
 - name: Create the node_exporter user
-  user:
+  ansible.builtin.user:
     name: "node_exporter"
-    groups: "node_exporter"
+    groups: >-
+      node_exporter{% if 'consul' in consul_group.ansible_facts.getent_group %},consul{% endif %}
     append: true
     shell: /usr/sbin/nologin
     system: true
@@ -17,7 +24,7 @@
 
 - block:
     - name: Download node_exporter binary
-      get_url:
+      ansible.builtin.get_url:
         url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
         mode: '0644'
@@ -28,7 +35,7 @@
       check_mode: false
 
     - name: Unpack node_exporter binary
-      unarchive:
+      ansible.builtin.unarchive:
         src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp"
         creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/node_exporter"
@@ -36,7 +43,7 @@
       check_mode: false
 
     - name: Propagate node_exporter binaries
-      copy:
+      ansible.builtin.copy:
         src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/node_exporter"
         dest: "/usr/local/bin/node_exporter"
         mode: 0755
