@@ -1,6 +1,6 @@
 ---
 - name: Copy the node_exporter systemd service file
-  template:
+  ansible.builtin.template:
     src: node_exporter.service.j2
     dest: /etc/systemd/system/node_exporter.service
     owner: root
@@ -8,8 +8,16 @@
     mode: 0644
   notify: restart node_exporter
 
+- name: Set permissions for /etc/consul.d directory
+  ansible.builtin.file:
+    path: /etc/consul.d
+    mode: '0750'
+    owner: consul
+    group: consul
+    recurse: no
+
 - name: Copy the node_exporter service file for consul
-  template:
+  ansible.builtin.template:
     src: node_exporter.json.j2
     dest: /etc/consul.d/node_exporter.json
     owner: consul
@@ -18,7 +26,7 @@
 
 - block:
     - name: Create node_exporter config directory
-      file:
+      ansible.builtin.file:
         path: "/etc/node_exporter"
         state: directory
         owner: root
@@ -26,7 +34,7 @@
         mode: u+rwX,g+rwX,o=rX
 
     - name: Copy the node_exporter config file
-      template:
+      ansible.builtin.template:
         src: config.yml.j2
         dest: /etc/node_exporter/config.yml
         owner: root
@@ -39,7 +47,7 @@
     ( node_exporter_basic_auth_users | length > 0 )
 
 - name: Create textfile collector dir
-  file:
+  ansible.builtin.file:
     path: "{{ node_exporter_textfile_dir }}"
     state: directory
     owner: "{{ _node_exporter_system_user }}"
@@ -49,7 +57,7 @@
   when: node_exporter_textfile_dir | length > 0
 
 - name: Allow node_exporter port in SELinux on RedHat OS family
-  seport:
+  ansible.builtin.seport:
     ports: "{{ node_exporter_web_listen_address.split(':')[-1] }}"
     proto: tcp
     setype: http_port_t
